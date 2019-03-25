@@ -51,7 +51,7 @@ defmodule CheckingAccount.Accounts do
   """
   def create_user(attrs \\ %{}) do
     %User{}
-    |> User.changeset(attrs)
+    |> User.creation_changeset(attrs)
     |> Repo.insert()
   end
 

@@ -6,9 +6,13 @@ defmodule CheckingAccount.AccountsTest do
   describe "users" do
     alias CheckingAccount.Accounts.User
 
-    @valid_attrs %{name: "some name", password_hash: "some password_hash", username: "some username"}
-    @update_attrs %{name: "some updated name", password_hash: "some updated password_hash", username: "some updated username"}
-    @invalid_attrs %{name: nil, password_hash: nil, username: nil}
+    @valid_attrs %{name: "some name", password: "some password", username: "some username"}
+    @update_attrs %{
+      name: "some updated name",
+      password: "some updated password",
+      username: "some updated username"
+    }
+    @invalid_attrs %{name: nil, password: nil, username: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -16,7 +20,7 @@ defmodule CheckingAccount.AccountsTest do
         |> Enum.into(@valid_attrs)
         |> Accounts.create_user()
 
-      user
+      %{user | password: nil}
     end
 
     test "list_users/0 returns all users" do
@@ -32,7 +36,7 @@ defmodule CheckingAccount.AccountsTest do
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
       assert user.name == "some name"
-      assert user.password_hash == "some password_hash"
+      assert Argon2.check_pass(user.password_hash, "some password_hash")
       assert user.username == "some username"
     end
 
@@ -44,7 +48,7 @@ defmodule CheckingAccount.AccountsTest do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
       assert user.name == "some updated name"
-      assert user.password_hash == "some updated password_hash"
+      assert Argon2.check_pass(user.password_hash, "some password_hash")
       assert user.username == "some updated username"
     end
 

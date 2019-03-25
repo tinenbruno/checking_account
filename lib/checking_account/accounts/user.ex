@@ -14,7 +14,26 @@ defmodule CheckingAccount.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :username, :password_hash])
-    |> validate_required([:name, :username, :password_hash])
+    |> cast(attrs, [:name, :username])
+    |> validate_required([:name, :username])
+  end
+
+  @doc false
+  def creation_changeset(user, attrs) do
+    user
+    |> changeset(attrs)
+    |> cast(attrs, [:password], [])
+    |> validate_length(:password, min: 6)
+    |> put_password_hash
+  end
+
+  defp put_password_hash(changeset) do
+    case changeset do
+      %Ecto.Changeset{valid?: true, changes: %{password: password}} ->
+        put_change(changeset, :password_hash, Argon2.hash_pwd_salt(password))
+
+      _ ->
+        changeset
+    end
   end
 end
