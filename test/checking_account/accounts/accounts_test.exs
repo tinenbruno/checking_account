@@ -68,5 +68,25 @@ defmodule CheckingAccount.AccountsTest do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
+
+    test "login_by_username_and_password logins a user" do
+      user_fixture()
+
+      assert {:ok, token, claims} =
+               Accounts.login_by_username_and_password("some username", "some password")
+    end
+
+    test "login_by_username_and_password returns error when wrong password" do
+      user_fixture()
+
+      assert {:error, :unauthorized} =
+               Accounts.login_by_username_and_password("some username", "wrong")
+    end
+
+    test "login_by_username_and_password returns error when wrong user" do
+      user_fixture()
+
+      assert {:error, :not_found} = Accounts.login_by_username_and_password("wrong", "wrong")
+    end
   end
 end

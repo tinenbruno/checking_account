@@ -101,4 +101,33 @@ defmodule CheckingAccount.Accounts do
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+
+  @doc """
+  Returns an `{:ok, token, claims}` Guardian structure after verifying
+  user credentials.
+
+  ## Examples
+
+      iex> login_by_username_and_password("username", "password")
+      {:ok, token, claims}
+
+  """
+  def login_by_username_and_password(username, password) do
+    user = Repo.get_by(User, username: username)
+
+    case user do
+      %User{} ->
+        case Argon2.check_pass(user, password) do
+          {:ok, _} ->
+            CheckingAccount.Guardian.encode_and_sign(user)
+
+          _ ->
+            {:error, :unauthorized}
+        end
+
+      nil ->
+        Argon2.no_user_verify()
+        {:error, :not_found}
+    end
+  end
 end
