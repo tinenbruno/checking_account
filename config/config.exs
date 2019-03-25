@@ -17,6 +17,10 @@ config :checking_account, CheckingAccountWeb.Endpoint,
   render_errors: [view: CheckingAccountWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: CheckingAccount.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :checking_account, CheckingAccount.Guardian,
+  issuer: "checking_account",
+  secret_key: "gJ1Rh4Hqc6r6dycFZro4UeSyZgYFQ1UErPCJgveeXzySQWg6GOJReNWq2Ipft7cW"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
