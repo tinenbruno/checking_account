@@ -67,4 +67,53 @@ defmodule CheckingAccount.Operations do
   def change_financial_transaction(%FinancialTransaction{} = financial_transaction) do
     FinancialTransaction.changeset(financial_transaction, %{})
   end
+
+  alias CheckingAccount.Operations.AccountingEntry
+
+  @doc """
+  Returns the list of accounting_entries.
+
+  ## Examples
+
+      iex> list_accounting_entries()
+      [%AccountingEntry{}, ...]
+
+  """
+  def list_accounting_entries do
+    Repo.all(AccountingEntry)
+  end
+
+  @doc """
+  Gets a single accounting_entry.
+
+  Raises `Ecto.NoResultsError` if the Accounting entry does not exist.
+
+  ## Examples
+
+      iex> get_accounting_entry!(123)
+      %AccountingEntry{}
+
+      iex> get_accounting_entry!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_accounting_entry!(id), do: Repo.get!(AccountingEntry, id)
+
+  @doc """
+  Creates a accounting_entry.
+
+  ## Examples
+
+      iex> create_accounting_entry(%{field: value})
+      {:ok, %AccountingEntry{}}
+
+      iex> create_accounting_entry(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_accounting_entry(attrs \\ %{}) do
+    %AccountingEntry{}
+    |> AccountingEntry.changeset(attrs)
+    |> Repo.insert()
+  end
 end
