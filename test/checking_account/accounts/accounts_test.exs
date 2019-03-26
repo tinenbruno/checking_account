@@ -1,6 +1,7 @@
 defmodule CheckingAccount.AccountsTest do
   use CheckingAccount.DataCase
 
+  import CheckingAccount.Fixtures, only: [user_fixture: 0, bank_account_fixture: 0]
   alias CheckingAccount.Accounts
 
   describe "users" do
@@ -13,15 +14,6 @@ defmodule CheckingAccount.AccountsTest do
       username: "some updated username"
     }
     @invalid_attrs %{name: nil, password: nil, username: nil}
-
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_user()
-
-      %{user | password: nil}
-    end
 
     test "list_users/0 returns all users" do
       user = user_fixture()
@@ -94,17 +86,6 @@ defmodule CheckingAccount.AccountsTest do
     alias CheckingAccount.Accounts.BankAccount
 
     @invalid_attrs %{}
-
-    def bank_account_fixture(attrs \\ %{}) do
-      user = user_fixture()
-
-      {:ok, bank_account} =
-        attrs
-        |> Enum.into(%{user_id: user.id})
-        |> Accounts.create_bank_account()
-
-      bank_account
-    end
 
     test "list_bank_accounts/0 returns all bank_accounts" do
       bank_account = bank_account_fixture()
