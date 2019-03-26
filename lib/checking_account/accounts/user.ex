@@ -2,11 +2,14 @@ defmodule CheckingAccount.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias CheckingAccount.Accounts.BankAccount
+
   schema "users" do
     field(:name, :string)
     field(:password, :string, virtual: true)
     field(:password_hash, :string)
     field(:username, :string)
+    has_one(:bank_account, BankAccount)
 
     timestamps()
   end

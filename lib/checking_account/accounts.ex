@@ -130,4 +130,82 @@ defmodule CheckingAccount.Accounts do
         {:error, :not_found}
     end
   end
+
+  alias CheckingAccount.Accounts.BankAccount
+
+  @doc """
+  Returns the list of bank_accounts.
+
+  ## Examples
+
+      iex> list_bank_accounts()
+      [%BankAccount{}, ...]
+
+  """
+  def list_bank_accounts do
+    Repo.all(BankAccount)
+  end
+
+  @doc """
+  Gets a single bank_account.
+
+  Raises `Ecto.NoResultsError` if the Bank account does not exist.
+
+  ## Examples
+
+      iex> get_bank_account!(123)
+      %BankAccount{}
+
+      iex> get_bank_account!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_bank_account!(id), do: Repo.get!(BankAccount, id)
+
+  @doc """
+  Creates a bank_account.
+
+  ## Examples
+
+      iex> create_bank_account(%{field: value})
+      {:ok, %BankAccount{}}
+
+      iex> create_bank_account(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_bank_account(attrs \\ %{}) do
+    %BankAccount{}
+    |> BankAccount.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a BankAccount.
+
+  ## Examples
+
+      iex> delete_bank_account(bank_account)
+      {:ok, %BankAccount{}}
+
+      iex> delete_bank_account(bank_account)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_bank_account(%BankAccount{} = bank_account) do
+    Repo.delete(bank_account)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking bank_account changes.
+
+  ## Examples
+
+      iex> change_bank_account(bank_account)
+      %Ecto.Changeset{source: %BankAccount{}}
+
+  """
+  def change_bank_account(%BankAccount{} = bank_account) do
+    BankAccount.changeset(bank_account, %{})
+  end
 end
