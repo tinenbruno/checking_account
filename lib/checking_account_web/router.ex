@@ -10,5 +10,7 @@ defmodule CheckingAccountWeb.Router do
 
     resources("/users", UserController, only: [:create])
     post("/users/login", UserController, :login, as: :login)
+
+    post("/financial_transactions/credit", FinancialTransactionController, :credit, as: :credit)
   end
 end

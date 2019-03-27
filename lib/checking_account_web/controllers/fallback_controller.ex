@@ -13,6 +13,13 @@ defmodule CheckingAccountWeb.FallbackController do
     |> render("error.json", changeset: changeset)
   end
 
+  def call(conn, {:error, _, %Ecto.Changeset{} = changeset, _}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(CheckingAccountWeb.ChangesetView)
+    |> render("error.json", changeset: changeset)
+  end
+
   def call(conn, {:error, :unauthorized}) do
     conn
     |> put_status(:unauthorized)

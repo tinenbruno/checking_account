@@ -2,7 +2,7 @@ defmodule CheckingAccount.Operations.FinancialTransaction do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @valid_kinds ~w(debit, credit, transfer)
+  @valid_kinds ~w(debit credit transfer)
 
   schema "financial_transactions" do
     field(:kind, :string)

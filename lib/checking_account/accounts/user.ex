@@ -27,6 +27,7 @@ defmodule CheckingAccount.Accounts.User do
     |> changeset(attrs)
     |> cast(attrs, [:password], [])
     |> validate_length(:password, min: 6)
+    |> validate_required([:password])
     |> put_password_hash
   end
 

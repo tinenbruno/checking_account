@@ -6,7 +6,12 @@ defmodule CheckingAccount.Operations do
   import Ecto.Query, warn: false
   alias CheckingAccount.Repo
 
-  alias CheckingAccount.Operations.FinancialTransaction
+  alias CheckingAccount.Operations.{
+    FinancialTransaction,
+    AccountingEntry,
+    OperationManager,
+    Adapters
+  }
 
   @doc """
   Returns the list of financial_transactions.
@@ -55,6 +60,14 @@ defmodule CheckingAccount.Operations do
     |> Repo.insert()
   end
 
+  def create_financial_transaction(:credit, attrs) do
+    financial_transaction = attrs |> Adapters.to_financial_transaction("credit")
+    accounting_entry = attrs |> Adapters.to_accounting_entry()
+
+    OperationManager.insert_operation(financial_transaction, accounting_entry)
+    |> Repo.transaction()
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking financial_transaction changes.
 
@@ -67,8 +80,6 @@ defmodule CheckingAccount.Operations do
   def change_financial_transaction(%FinancialTransaction{} = financial_transaction) do
     FinancialTransaction.changeset(financial_transaction, %{})
   end
-
-  alias CheckingAccount.Operations.AccountingEntry
 
   @doc """
   Returns the list of accounting_entries.
