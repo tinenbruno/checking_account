@@ -19,6 +19,7 @@ defmodule CheckingAccount.Accounts.User do
     user
     |> cast(attrs, [:name, :username])
     |> validate_required([:name, :username])
+    |> unique_constraint(:username)
   end
 
   @doc false

@@ -36,6 +36,11 @@ defmodule CheckingAccount.AccountsTest do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
     end
 
+    test "cannot create_user/1 with same username" do
+      Accounts.create_user(@valid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@valid_attrs)
+    end
+
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
