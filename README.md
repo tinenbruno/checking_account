@@ -57,6 +57,12 @@ Currently it supports via API:
 
 The login endpoint generates a `Bearer` token that should be passed as an authorization header to the calls of the private endpoints.
 
+The bank account creation for a user still needs to be done manually in the console. This can be done using:
+
+```
+iex> CheckingAccount.Accounts.create_bank_account(%{user_id: user_id})
+```
+
 ## Running Locally
 
 To start your Phoenix server:
