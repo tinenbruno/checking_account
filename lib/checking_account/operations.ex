@@ -61,23 +61,16 @@ defmodule CheckingAccount.Operations do
   end
 
   def create_financial_transaction(:credit, attrs) do
-    financial_transaction = attrs |> Adapters.to_financial_transaction("credit")
-    accounting_entry = attrs |> Adapters.to_accounting_entry(:destination)
-
-    OperationManager.insert_operation(financial_transaction, accounting_entry)
+    attrs
+    |> Adapters.to_operation(:credit)
+    |> OperationManager.insert_operation()
     |> Repo.transaction()
   end
 
   def create_financial_transaction(:transfer, attrs) do
-    financial_transaction = attrs |> Adapters.to_financial_transaction("transfer")
-    source_accounting_entry = attrs |> Adapters.to_accounting_entry(:source)
-    destination_accounting_entry = attrs |> Adapters.to_accounting_entry(:destination)
-
-    OperationManager.insert_operation(
-      financial_transaction,
-      destination_accounting_entry,
-      source_accounting_entry
-    )
+    attrs
+    |> Adapters.to_operation(:transfer)
+    |> OperationManager.insert_operation()
     |> Repo.transaction()
   end
 
@@ -139,5 +132,17 @@ defmodule CheckingAccount.Operations do
     %AccountingEntry{}
     |> AccountingEntry.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def get_balance(%{bank_account_id: account_id}) do
+    from(e in AccountingEntry,
+      where: [bank_account_id: ^account_id],
+      select: sum(e.amount)
+    )
+    |> Repo.one() || 0
+  end
+
+  def get_balance(%{}) do
+    {:error, :account_not_found}
   end
 end

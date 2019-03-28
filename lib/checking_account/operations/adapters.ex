@@ -1,6 +1,25 @@
 defmodule CheckingAccount.Operations.Adapters do
   alias CheckingAccount.Money
 
+  alias CheckingAccount.Operations.Operation
+
+  def to_operation(attrs, :credit) do
+    %Operation{
+      transaction: attrs |> to_financial_transaction("credit"),
+      destination_entry: attrs |> to_accounting_entry(:destination),
+      kind: :credit
+    }
+  end
+
+  def to_operation(attrs, :transfer) do
+    %Operation{
+      transaction: attrs |> to_financial_transaction("transfer"),
+      source_entry: attrs |> to_accounting_entry(:source),
+      destination_entry: attrs |> to_accounting_entry(:destination),
+      kind: :transfer
+    }
+  end
+
   def to_financial_transaction(%{"description" => description}, kind) do
     %{description: description, kind: kind}
   end
