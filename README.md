@@ -2,6 +2,10 @@
 
 A checking account REST API, where you can manage `users`, `bank_accounts` and `transactions`.
 
+## Dependencies
+
+This project was built using Elixir `1.7.3` and Phoenix `1.4.0`.
+
 ## Overview
 
 The checking account is a transaction based bank account. Each transaction generates entries in the corresponding account which represent the history of operations under that account.
