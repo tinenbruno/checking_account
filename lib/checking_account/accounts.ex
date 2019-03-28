@@ -162,6 +162,18 @@ defmodule CheckingAccount.Accounts do
   """
   def get_bank_account!(id), do: Repo.get!(BankAccount, id)
 
+  def get_bank_account_by!(id, user_id) do
+    Repo.get_by!(BankAccount, user_id: user_id, id: id)
+  end
+
+  def is_user_account?(nil, user_id) do
+    false
+  end
+
+  def is_user_account?(id, user_id) do
+    !is_nil(Repo.get_by(BankAccount, user_id: user_id, id: id))
+  end
+
   @doc """
   Creates a bank_account.
 

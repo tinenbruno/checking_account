@@ -61,6 +61,21 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
       conn = post(conn, Routes.credit_path(conn, :credit), operation: @credit_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    @tag :logged_in
+    test "renders errors when account is not from current_user", %{conn: conn} do
+      another_bank_account = bank_account_fixture()
+
+      conn =
+        post(conn, Routes.credit_path(conn, :credit),
+          operation: %{
+            @credit_attrs
+            | destination_account_id: another_bank_account.id
+          }
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
   end
 
   describe "transfer operation" do
@@ -80,7 +95,8 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
 
       Operations.create_financial_transaction(:credit, %{
         "amount" => 12.34,
-        "destination_account_id" => source.id
+        "destination_account_id" => source.id,
+        "current_user" => source.user
       })
 
       conn =
@@ -119,6 +135,25 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
 
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    @tag :logged_in
+    test "renders errors when source account is not from current_user", %{
+      conn: conn
+    } do
+      destination = bank_account_fixture()
+      another_bank_account = bank_account_fixture()
+
+      conn =
+        post(conn, Routes.transfer_path(conn, :transfer),
+          operation: %{
+            @transfer_attrs
+            | destination_account_id: destination.id,
+              source_account_id: another_bank_account.id
+          }
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
   end
 
   describe "balance" do
@@ -129,7 +164,8 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
     } do
       Operations.create_financial_transaction(:credit, %{
         "amount" => 12.34,
-        "destination_account_id" => account.id
+        "destination_account_id" => account.id,
+        "current_user" => account.user
       })
 
       conn = get(conn, Routes.balance_path(conn, :balance, bank_account_id: account.id))
@@ -142,6 +178,18 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
       conn: conn
     } do
       conn = get(conn, Routes.balance_path(conn, :balance, bank_account_id: 123_456))
+
+      assert %{"detail" => "Account not found"} = json_response(conn, 422)["errors"]
+    end
+
+    @tag :logged_in
+    test "returns error if account is from another user", %{
+      conn: conn
+    } do
+      another_bank_account = bank_account_fixture()
+
+      conn =
+        get(conn, Routes.balance_path(conn, :balance, bank_account_id: another_bank_account.id))
 
       assert %{"detail" => "Account not found"} = json_response(conn, 422)["errors"]
     end

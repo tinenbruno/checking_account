@@ -7,6 +7,7 @@ defmodule CheckingAccount.Operations.Adapters do
     %Operation{
       transaction: attrs |> to_financial_transaction("credit"),
       destination_entry: attrs |> to_accounting_entry(:destination),
+      current_user: attrs["current_user"],
       kind: :credit
     }
   end
@@ -16,6 +17,7 @@ defmodule CheckingAccount.Operations.Adapters do
       transaction: attrs |> to_financial_transaction("transfer"),
       source_entry: attrs |> to_accounting_entry(:source),
       destination_entry: attrs |> to_accounting_entry(:destination),
+      current_user: attrs["current_user"],
       kind: :transfer
     }
   end

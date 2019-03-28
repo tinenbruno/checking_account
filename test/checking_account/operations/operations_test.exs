@@ -3,12 +3,14 @@ defmodule CheckingAccount.OperationsTest do
 
   import CheckingAccount.Fixtures,
     only: [
+      user_fixture: 0,
       bank_account_fixture: 0,
       financial_transaction_fixture: 0,
       accounting_entry_fixture: 0
     ]
 
   alias CheckingAccount.Operations
+  alias CheckingAccount.Repo
 
   describe "financial_transactions" do
     alias CheckingAccount.Operations.FinancialTransaction
@@ -85,24 +87,42 @@ defmodule CheckingAccount.OperationsTest do
 
   describe "balance" do
     test "returns balance if account has entries" do
-      bank_account = bank_account_fixture()
+      bank_account = bank_account_fixture() |> Repo.preload(:user)
 
       Operations.create_financial_transaction(:credit, %{
         "amount" => 12.34,
-        "destination_account_id" => bank_account.id
+        "destination_account_id" => bank_account.id,
+        "current_user" => bank_account.user
       })
 
-      assert Operations.get_balance(%{bank_account_id: bank_account.id}) == {:ok, 1234}
+      assert Operations.get_balance(%{
+               bank_account_id: bank_account.id,
+               current_user: bank_account.user
+             }) == {:ok, 1234}
     end
 
     test "returns 0 if account has no entries" do
-      bank_account = bank_account_fixture()
+      bank_account = bank_account_fixture() |> Repo.preload(:user)
 
-      assert Operations.get_balance(%{bank_account_id: bank_account.id}) == {:ok, 0}
+      assert Operations.get_balance(%{
+               bank_account_id: bank_account.id,
+               current_user: bank_account.user
+             }) == {:ok, 0}
     end
 
     test "returns error if account not found" do
-      assert Operations.get_balance(%{bank_account_id: 12345}) == {:error, :account_not_found}
+      bank_account = bank_account_fixture() |> Repo.preload(:user)
+
+      assert Operations.get_balance(%{bank_account_id: 12345, current_user: bank_account.user}) ==
+               {:error, :account_not_found}
+    end
+
+    test "returns error if account is not from user" do
+      bank_account = bank_account_fixture() |> Repo.preload(:user)
+      user = user_fixture()
+
+      assert Operations.get_balance(%{bank_account_id: bank_account.id, current_user: user}) ==
+               {:error, :account_not_found}
     end
   end
 end

@@ -138,9 +138,9 @@ defmodule CheckingAccount.Operations do
   Gets the balance from an account as an integer. To show this info to the end
   user use the Money Adapter.
   """
-  def get_balance(%{bank_account_id: account_id}) do
+  def get_balance(%{bank_account_id: account_id, current_user: current_user}) do
     try do
-      Accounts.get_bank_account!(account_id)
+      Accounts.get_bank_account_by!(account_id, current_user.id)
 
       balance =
         from(e in AccountingEntry,

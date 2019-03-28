@@ -7,6 +7,10 @@ defmodule CheckingAccountWeb.FinancialTransactionController do
   action_fallback(CheckingAccountWeb.FallbackController)
 
   def credit(conn, %{"operation" => operation_params}) do
+    operation_params =
+      operation_params
+      |> Map.put("current_user", conn.assigns[:current_user])
+
     with {:ok,
           %{
             financial_transaction: %FinancialTransaction{} = financial_transaction
@@ -20,6 +24,10 @@ defmodule CheckingAccountWeb.FinancialTransactionController do
   end
 
   def transfer(conn, %{"operation" => operation_params}) do
+    operation_params =
+      operation_params
+      |> Map.put("current_user", conn.assigns[:current_user])
+
     with {:ok,
           %{
             financial_transaction: %FinancialTransaction{} = financial_transaction
@@ -33,7 +41,11 @@ defmodule CheckingAccountWeb.FinancialTransactionController do
   end
 
   def balance(conn, %{"bank_account_id" => bank_account_id}) do
-    with {:ok, balance} <- Operations.get_balance(%{bank_account_id: bank_account_id}) do
+    with {:ok, balance} <-
+           Operations.get_balance(%{
+             bank_account_id: bank_account_id,
+             current_user: conn.assigns[:current_user]
+           }) do
       conn
       |> put_status(:ok)
       |> render("balance.json", balance: balance)

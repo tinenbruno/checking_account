@@ -1,7 +1,7 @@
 defmodule CheckingAccount.Operations.OperationManager do
   alias Ecto.Multi
 
-  alias CheckingAccount.Operations
+  alias CheckingAccount.{Operations, Accounts}
 
   alias CheckingAccount.Operations.{
     FinancialTransaction,
@@ -12,9 +12,11 @@ defmodule CheckingAccount.Operations.OperationManager do
   def insert_operation(%Operation{
         transaction: transaction_attrs,
         destination_entry: destination_entry_attrs,
+        current_user: current_user,
         kind: :credit
       }) do
     Multi.new()
+    |> validate_account_ownership(destination_entry_attrs, current_user)
     |> insert_financial_transaction(transaction_attrs)
     |> insert_entry(:credit, destination_entry_attrs, :credit_accounting_entry)
   end
@@ -23,10 +25,12 @@ defmodule CheckingAccount.Operations.OperationManager do
         kind: :transfer,
         transaction: transaction_attrs,
         destination_entry: destination_entry_attrs,
-        source_entry: source_entry_attrs
+        source_entry: source_entry_attrs,
+        current_user: current_user
       }) do
     Multi.new()
-    |> validate_source_account_balance(source_entry_attrs)
+    |> validate_account_ownership(source_entry_attrs, current_user)
+    |> validate_source_account_balance(source_entry_attrs, current_user)
     |> insert_financial_transaction(transaction_attrs)
     |> insert_entry(:credit, destination_entry_attrs, :credit_accounting_entry)
     |> insert_entry(:debit, source_entry_attrs, :debit_accounting_entry)
@@ -47,10 +51,30 @@ defmodule CheckingAccount.Operations.OperationManager do
     end)
   end
 
-  defp validate_source_account_balance(multi, %{amount: amount} = source_entry_attrs) do
+  defp validate_account_ownership(
+         multi,
+         %{bank_account_id: bank_account_id},
+         current_user
+       ) do
+    multi
+    |> Multi.run(:is_user_account, fn _, _ ->
+      if Accounts.is_user_account?(bank_account_id, current_user.id) do
+        {:ok, 'ok'}
+      else
+        {:error, :account_not_found}
+      end
+    end)
+  end
+
+  defp validate_source_account_balance(
+         multi,
+         %{amount: amount} = source_entry_attrs,
+         current_user
+       ) do
     multi
     |> Multi.run(:balance, fn _, _ ->
-      {:ok, balance} = Operations.get_balance(source_entry_attrs)
+      {:ok, balance} =
+        Operations.get_balance(Map.put(source_entry_attrs, :current_user, current_user))
 
       if balance < -amount do
         {:error, :insufficient_balance}
