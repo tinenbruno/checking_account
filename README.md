@@ -8,10 +8,52 @@ The checking account is a transaction based bank account. Each transaction gener
 
 Currently it supports via API:
   * `user` creation: `POST /api/users` (`PUBLIC`)
+  ```
+  Expected payload:
+  {
+      "user": {
+          "name": "bruno",
+          "username": "bt",
+          "password": "123456"
+      }
+  }
+  ```
   * `user` login: `POST /api/users/login` (`PUBLIC`)
+  ```
+  Expected payload:
+  {
+      "username": "username",
+      "password": "123456"
+  }
+  ```
   * `credit` operation: `POST /api/operations/credit` (`PRIVATE`)
-  * `debit` operation: `POST /api/operations/transfer` (`PRIVATE`)
-  * `transfer` operation: `POST /api/balance` (`PRIVATE`)
+  ```
+  Expected payload:
+  {
+      "operation": {
+          "amount": 100.12,
+          "destination_account_id": 1,
+          "description": "salary"
+      }
+  }
+  ```
+
+  * `transfer` operation: `POST /api/operations/transfer` (`PRIVATE`)
+  ```
+  Expected payload:
+  {
+      "operation": {
+          "amount": 1.23,
+          "source_account_id": 1,
+          "destination_account_id": 2,
+          "description": "money to friend"
+      }
+  }
+  ```
+  * `balance` operation: `GET /api/balance` (`PRIVATE`)
+  ```
+  Expected query string: ?bank_account_id=3
+  ```
 
 The login endpoint generates a `Bearer` token that should be passed as an authorization header to the calls of the private endpoints.
 
