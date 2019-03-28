@@ -24,7 +24,14 @@ defmodule CheckingAccountWeb.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> put_view(CheckingAccountWeb.ErrorView)
-    |> render("insufficient_balance.json")
+    |> render("error_message.json", message: "Insufficient balance on source account")
+  end
+
+  def call(conn, {:error, :account_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(CheckingAccountWeb.ErrorView)
+    |> render("error_message.json", message: "Account not found")
   end
 
   def call(conn, {:error, :unauthorized}) do

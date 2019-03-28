@@ -21,5 +21,6 @@ defmodule CheckingAccountWeb.Router do
     pipe_through(:authenticated_api)
     post("/operations/credit", FinancialTransactionController, :credit, as: :credit)
     post("/operations/transfer", FinancialTransactionController, :transfer, as: :transfer)
+    get("/balance", FinancialTransactionController, :balance, as: :balance)
   end
 end

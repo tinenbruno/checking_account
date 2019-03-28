@@ -4,6 +4,10 @@ defmodule CheckingAccount.Money.Adapters do
     |> Kernel.trunc()
   end
 
+  def from_money(value) do
+    value / 100
+  end
+
   def to_string(value) do
     {integer, cents} =
       value

@@ -120,4 +120,30 @@ defmodule CheckingAccountWeb.FinancialTransactionControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
+
+  describe "balance" do
+    @tag :logged_in
+    test "returns balance for an existing account", %{
+      conn: conn,
+      bank_account: account
+    } do
+      Operations.create_financial_transaction(:credit, %{
+        "amount" => 12.34,
+        "destination_account_id" => account.id
+      })
+
+      conn = get(conn, Routes.balance_path(conn, :balance, bank_account_id: account.id))
+
+      assert %{"balance" => 12.34} = json_response(conn, 200)["data"]
+    end
+
+    @tag :logged_in
+    test "returns error if account not found", %{
+      conn: conn
+    } do
+      conn = get(conn, Routes.balance_path(conn, :balance, bank_account_id: 123_456))
+
+      assert %{"detail" => "Account not found"} = json_response(conn, 422)["errors"]
+    end
+  end
 end

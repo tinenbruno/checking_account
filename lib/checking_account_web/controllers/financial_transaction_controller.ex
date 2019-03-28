@@ -31,4 +31,12 @@ defmodule CheckingAccountWeb.FinancialTransactionController do
       )
     end
   end
+
+  def balance(conn, %{"bank_account_id" => bank_account_id}) do
+    with {:ok, balance} <- Operations.get_balance(%{bank_account_id: bank_account_id}) do
+      conn
+      |> put_status(:ok)
+      |> render("balance.json", balance: balance)
+    end
+  end
 end
