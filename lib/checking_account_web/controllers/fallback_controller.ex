@@ -20,6 +20,13 @@ defmodule CheckingAccountWeb.FallbackController do
     |> render("error.json", changeset: changeset)
   end
 
+  def call(conn, {:error, :balance, :insufficient_balance, _}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(CheckingAccountWeb.ErrorView)
+    |> render("insufficient_balance.json")
+  end
+
   def call(conn, {:error, :unauthorized}) do
     conn
     |> put_status(:unauthorized)

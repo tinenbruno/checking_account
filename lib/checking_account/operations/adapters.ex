@@ -5,10 +5,29 @@ defmodule CheckingAccount.Operations.Adapters do
     %{description: description, kind: kind}
   end
 
+  def to_financial_transaction(%{}, kind) do
+    %{kind: kind}
+  end
+
+  def to_accounting_entry(kind, params, currency \\ "BRL")
+
   def to_accounting_entry(
         %{"amount" => amount, "destination_account_id" => bank_account_id},
-        currency \\ "BRL"
+        :destination,
+        currency
       ) do
+    to_accounting_entry(amount, bank_account_id, currency)
+  end
+
+  def to_accounting_entry(
+        %{"amount" => amount, "source_account_id" => bank_account_id},
+        :source,
+        currency
+      ) do
+    to_accounting_entry(-amount, bank_account_id, currency)
+  end
+
+  def to_accounting_entry(amount, bank_account_id, currency) do
     %{
       amount: amount |> Money.Adapters.to_money(),
       currency: currency,

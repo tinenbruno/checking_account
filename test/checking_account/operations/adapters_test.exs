@@ -12,8 +12,11 @@ defmodule CheckingAccount.Operations.AdaptersTest do
                }
     end
 
-    test "to_accouting_entry/1 adapts params to accouting entry attrs" do
-      assert Adapters.to_accounting_entry(%{"amount" => 123, "destination_account_id" => 1}) ==
+    test "to_accouting_entry/2 adapts params to accouting entry attrs" do
+      assert Adapters.to_accounting_entry(
+               %{"amount" => 123, "destination_account_id" => 1},
+               :destination
+             ) ==
                %{
                  amount: 12300,
                  currency: "BRL",

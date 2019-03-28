@@ -26,4 +26,18 @@ defmodule CheckingAccount.Operations.AccountingEntry do
     |> foreign_key_constraint(:financial_transaction_id)
     |> validate_inclusion(:currency, @supported_currencies)
   end
+
+  @doc false
+  def credit_changeset(accounting_entry, attrs) do
+    accounting_entry
+    |> changeset(attrs)
+    |> validate_number(:amount, greater_than: 0)
+  end
+
+  @doc false
+  def debit_changeset(accounting_entry, attrs) do
+    accounting_entry
+    |> changeset(attrs)
+    |> validate_number(:amount, less_than: 0)
+  end
 end

@@ -13,7 +13,7 @@ defmodule CheckingAccount.Fixtures do
   end
 
   def bank_account_fixture(attrs \\ %{}) do
-    user = user_fixture()
+    user = user_fixture(%{username: Ecto.UUID.generate()})
 
     {:ok, bank_account} =
       %{user_id: user.id}

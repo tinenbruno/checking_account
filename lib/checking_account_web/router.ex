@@ -5,12 +5,21 @@ defmodule CheckingAccountWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :authenticated_api do
+    plug(:accepts, ["json"])
+    plug(CheckingAccountWeb.AuthenticationPlug)
+  end
+
   scope "/api", CheckingAccountWeb do
     pipe_through(:api)
 
     resources("/users", UserController, only: [:create])
     post("/users/login", UserController, :login, as: :login)
+  end
 
-    post("/financial_transactions/credit", FinancialTransactionController, :credit, as: :credit)
+  scope "/api", CheckingAccountWeb do
+    pipe_through(:authenticated_api)
+    post("/operations/credit", FinancialTransactionController, :credit, as: :credit)
+    post("/operations/transfer", FinancialTransactionController, :transfer, as: :transfer)
   end
 end

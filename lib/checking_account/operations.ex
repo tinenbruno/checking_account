@@ -62,9 +62,22 @@ defmodule CheckingAccount.Operations do
 
   def create_financial_transaction(:credit, attrs) do
     financial_transaction = attrs |> Adapters.to_financial_transaction("credit")
-    accounting_entry = attrs |> Adapters.to_accounting_entry()
+    accounting_entry = attrs |> Adapters.to_accounting_entry(:destination)
 
     OperationManager.insert_operation(financial_transaction, accounting_entry)
+    |> Repo.transaction()
+  end
+
+  def create_financial_transaction(:transfer, attrs) do
+    financial_transaction = attrs |> Adapters.to_financial_transaction("transfer")
+    source_accounting_entry = attrs |> Adapters.to_accounting_entry(:source)
+    destination_accounting_entry = attrs |> Adapters.to_accounting_entry(:destination)
+
+    OperationManager.insert_operation(
+      financial_transaction,
+      destination_accounting_entry,
+      source_accounting_entry
+    )
     |> Repo.transaction()
   end
 
