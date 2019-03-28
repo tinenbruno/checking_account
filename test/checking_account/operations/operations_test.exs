@@ -82,4 +82,27 @@ defmodule CheckingAccount.OperationsTest do
       assert {:error, %Ecto.Changeset{}} = Operations.create_accounting_entry(@invalid_attrs)
     end
   end
+
+  describe "balance" do
+    test "returns balance if account has entries" do
+      bank_account = bank_account_fixture()
+
+      Operations.create_financial_transaction(:credit, %{
+        "amount" => 12.34,
+        "destination_account_id" => bank_account.id
+      })
+
+      assert Operations.get_balance(%{bank_account_id: bank_account.id}) == {:ok, 1234}
+    end
+
+    test "returns 0 if account has no entries" do
+      bank_account = bank_account_fixture()
+
+      assert Operations.get_balance(%{bank_account_id: bank_account.id}) == {:ok, 0}
+    end
+
+    test "returns error if account not found" do
+      assert Operations.get_balance(%{bank_account_id: 12345}) == {:error, :account_not_found}
+    end
+  end
 end

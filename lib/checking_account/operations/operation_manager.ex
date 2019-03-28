@@ -50,7 +50,7 @@ defmodule CheckingAccount.Operations.OperationManager do
   defp validate_source_account_balance(multi, %{amount: amount} = source_entry_attrs) do
     multi
     |> Multi.run(:balance, fn _, _ ->
-      balance = Operations.get_balance(source_entry_attrs)
+      {:ok, balance} = Operations.get_balance(source_entry_attrs)
 
       if balance < -amount do
         {:error, :insufficient_balance}

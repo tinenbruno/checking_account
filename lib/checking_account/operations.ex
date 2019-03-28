@@ -4,7 +4,7 @@ defmodule CheckingAccount.Operations do
   """
 
   import Ecto.Query, warn: false
-  alias CheckingAccount.Repo
+  alias CheckingAccount.{Repo, Accounts}
 
   alias CheckingAccount.Operations.{
     FinancialTransaction,
@@ -134,12 +134,25 @@ defmodule CheckingAccount.Operations do
     |> Repo.insert()
   end
 
+  @doc """
+  Gets the balance from an account as an integer. To show this info to the end
+  user use the Money Adapter.
+  """
   def get_balance(%{bank_account_id: account_id}) do
-    from(e in AccountingEntry,
-      where: [bank_account_id: ^account_id],
-      select: sum(e.amount)
-    )
-    |> Repo.one() || 0
+    try do
+      Accounts.get_bank_account!(account_id)
+
+      balance =
+        from(e in AccountingEntry,
+          where: [bank_account_id: ^account_id],
+          select: sum(e.amount)
+        )
+        |> Repo.one() || 0
+
+      {:ok, balance}
+    rescue
+      _ in Ecto.NoResultsError -> {:error, :account_not_found}
+    end
   end
 
   def get_balance(%{}) do
